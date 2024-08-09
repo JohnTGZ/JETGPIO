@@ -2434,7 +2434,7 @@ int i2cWriteArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned 
 		data.block[i] = valArr[i-1];
   }
 
-  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_WRITE, reg, I2C_SMBUS_BLOCK_DATA, &data)<0) {
+  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_WRITE, reg, I2C_SMBUS_I2C_BLOCK_DATA, &data)<0) {
     printf( "Not possible to write register\n");
     status = -8;}
   return status;
@@ -2477,7 +2477,7 @@ int i2cReadArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned c
     status = -6;
   }
   
-  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_READ, reg, I2C_SMBUS_BLOCK_DATA, &data)<0) {
+  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_READ, reg, I2C_SMBUS_I2C_BLOCK_DATA, &data)<0) {
     printf( "Not possible to read register\n");
     status = -7;}
   else
