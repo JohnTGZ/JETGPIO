@@ -2490,7 +2490,6 @@ int i2cReadArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned c
   return status;
 }
 
-
 int spiOpen(unsigned spiChan, unsigned speed, unsigned mode, unsigned cs_delay, unsigned bits_word, unsigned lsb_first, unsigned cs_change){
     
   char dev[20], buf[100];

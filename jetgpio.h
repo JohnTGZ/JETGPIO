@@ -632,6 +632,31 @@ int i2cReadWordData(unsigned handle, unsigned i2cAddr, unsigned i2cReg);
  * @code gyro_x_H = i2cReadWordData(MPU6050, 0x68, 0x43); // getting register 0x43 and 0x44 out of opened connection MPU6050 with i2C address 0x68 @endcode
 */
 
+int i2cWriteArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned char* valArr, unsigned char len);
+/**<
+ * @brief This writes bytes of a specified length to the specified consecutive register(s) of the device associated with handle.
+ *
+ * @param handle >=0, as returned by a call to [*i2cOpen*]
+ * @param i2cAddr 0-0x7F, the I2C slave address
+ * @param i2cReg 0-255, the register to write
+ * @param wVal 0-0xFFFF, the value to write
+ * @return Returns 0 if OK, negative number otherwise
+ *
+ * @code writestat = i2cWriteWordData(MPU6050, 0x68, 0x1B, 0x0000); // writing 0x0000 to register address 0x1B & 0x1C on opened chanel MPU6050 with i2C address 0x68 @endcode
+*/
+
+int i2cReadArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned char* valArr, unsigned char len);
+/**<
+ * @brief This reads bytes of a specified length from the specified consecutive register(s) of the device associated with handle.
+ * @param handle >=0, as returned by a call to [*i2cOpen*]
+ * @param i2cAddr 0-0x7F, the I2C slave address
+ * @param i2cReg 0-255, the register to read
+ * @return Returns the word read (>=0) if OK, otherwise a negative number
+ *
+ * @code gyro_x_H = i2cReadWordData(MPU6050, 0x68, 0x43); // getting register 0x43 and 0x44 out of opened connection MPU6050 with i2C address 0x68 @endcode
+*/
+
+
 int spiOpen(unsigned spiChan, unsigned speed, unsigned mode, unsigned cs_delay, unsigned bits_word, unsigned lsb_first, unsigned cs_change);
 /**<
  * @brief This function returns a handle for the SPI device on the channel.
