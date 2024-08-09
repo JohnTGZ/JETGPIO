@@ -2472,7 +2472,7 @@ int i2cReadArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned c
     status = -5;
   }
     
-  if ((i2cInfo[handle].funcs & I2C_FUNC_SMBUS_READ_BLOCK_DATA) == 0){
+  if ((i2cInfo[handle].funcs & I2C_FUNC_SMBUS_READ_I2C_BLOCK) == 0){
     printf( "Read block data function not supported by device\n");
     status = -6;
   }
