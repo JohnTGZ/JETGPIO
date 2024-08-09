@@ -2085,7 +2085,7 @@ int i2c_smbus_access(int file, char read_write, __u8 command, int size, union i2
   args.command = command;
   args.size = size;
   args.data = data;
-  return ioctl(file,I2C_SMBUS,&args);
+  return ioctl(file, I2C_SMBUS, &args);
 }
 
 int i2cOpen(unsigned i2cBus, unsigned i2cFlags){
@@ -2378,13 +2378,118 @@ int i2cReadWordData(unsigned handle, unsigned i2cAddr, unsigned reg){
     status = -6;
   }
 	
-  if (i2c_smbus_access(i2cInfo[handle].fd,I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, &data)<0) {
+  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_READ, reg, I2C_SMBUS_WORD_DATA, &data)<0) {
     printf( "Not possible to read register\n");
     status = -7;}
   else
     {status = 0x0FFFF & data.word;}
   return status;
 }
+
+int i2cWriteArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned char* valArr, unsigned char len){
+    
+  int status = 0;
+  union i2c_smbus_data data;
+	
+  if (handle >= 2) {
+    printf( "Bad handle (%d)\n", handle);
+    status = -1;
+  }
+
+  if (i2cInfo[handle].state != I2C_OPENED){
+    printf( "i2c%d is not open\n", handle);
+    status = -2;
+  }
+    
+  if (i2cAddr > 0x7f){
+    printf( "Bad I2C address (%d)\n", i2cAddr);
+    status = -3;
+  }
+
+  if (reg > 0xFF){
+    printf( "Register address on device bigger than 0xFF\n");
+    status = -4;
+  }
+
+  if (len > 32){
+    printf( "Array Length to be written bigger than 32\n");
+    status = -5;
+  }
+
+  i2cInfo[handle].addr = i2cAddr;
+
+  if (ioctl(i2cInfo[handle].fd, I2C_SLAVE, i2cAddr) < 0) {
+    printf( "I2C slave address not found on bus\n");
+    status = -6;
+  }
+    
+  if ((i2cInfo[handle].funcs & I2C_FUNC_SMBUS_WRITE_BLOCK_DATA) == 0){
+    printf( "Write block data function not supported by device\n");
+    status = -7;
+  }
+
+  data.block[0] = len;
+  
+	for (size_t i = 1; i <= len; i++){
+		data.block[i] = valArr[i-1];
+  }
+
+  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_WRITE, reg, I2C_SMBUS_BLOCK_DATA, &data)<0) {
+    printf( "Not possible to write register\n");
+    status = -8;}
+  return status;
+}
+
+int i2cReadArrayData(unsigned handle, unsigned i2cAddr, unsigned reg, unsigned char* valArr, unsigned char len){
+    
+  int status = 0;
+  union i2c_smbus_data data;
+	
+  if (handle >= 2) {
+    printf( "Bad handle (%d)\n", handle);
+    status = -1;
+  }
+
+  if (i2cInfo[handle].state != I2C_OPENED){
+    printf( "i2c%d is not open\n", handle);
+    status = -2;
+  }
+    
+  if (i2cAddr > 0x7f){
+    printf( "Bad I2C address (%d)\n", i2cAddr);
+    status = -3;
+  }
+
+  if (reg > 0xFF){
+    printf( "Register address on device bigger than 0xFF\n");
+    status = -4;
+  }
+
+  i2cInfo[handle].addr = i2cAddr;
+
+  if (ioctl(i2cInfo[handle].fd, I2C_SLAVE, i2cAddr) < 0) {
+    printf( "I2C slave address not found on bus\n");
+    status = -5;
+  }
+    
+  if ((i2cInfo[handle].funcs & I2C_FUNC_SMBUS_READ_BLOCK_DATA) == 0){
+    printf( "Read block data function not supported by device\n");
+    status = -6;
+  }
+  
+  if (i2c_smbus_access(i2cInfo[handle].fd, I2C_SMBUS_READ, reg, I2C_SMBUS_BLOCK_DATA, &data)<0) {
+    printf( "Not possible to read register\n");
+    status = -7;}
+  else
+  {
+    status = data.block[0];
+    for (size_t i = 1; i <= data.block[0]; i++){
+      valArr[i-1] = data.block[i];
+    }
+  }
+  return status;
+}
+
 
 int spiOpen(unsigned spiChan, unsigned speed, unsigned mode, unsigned cs_delay, unsigned bits_word, unsigned lsb_first, unsigned cs_change){
     
